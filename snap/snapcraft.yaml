@@ -1,22 +1,32 @@
 name: thepassage
-base: core22
-version: '2.0'
 summary: Solve puzzles through debugging and editing parts of real code
 description: |
   Ada has landed on a mysterious planet with one mission; find the secret map to locate the hidden bunker. Fight alien monsters, tackle obstacles and puzzles, and hack the world. Debug Javascript puzzles to help Ada create news skills, and navigate obstacles on her way through The Passage.
-
-grade: stable
+version: '2.0'
+base: core22
+architectures:
+- amd64
 confinement: strict
+grade: stable
+
+apps:
+  thepassage:
+    extensions: [gnome]
+    command: /The.Passage/The.Passage.x86_64
+    plugs:
+      - audio-playback
+      - desktop
+      - desktop-legacy
+      - joystick
+      - network
+      - opengl
+      - wayland
+      - x11
 
 parts:
   thepassage:
-    plugin: dump
     source: https://github.com/endless-network/ThePassage_Binary/releases/download/v2.0/The.Passage.zip
-    stage-packages:
-      - libgdk-pixbuf2.0-0
-      - libgtk2.0-0
-      - libgl1
-      - libpulse0
+    plugin: dump
     override-prime: |
       craftctl default
       mkdir -p $CRAFT_PRIME/The.Passage
@@ -30,69 +40,3 @@ parts:
     override-build: |
       mkdir -p $CRAFT_PART_INSTALL/meta/gui
       cp * $CRAFT_PART_INSTALL/meta/gui
-  alsa-mixin:
-    plugin: dump
-    source: https://github.com/diddlesnaps/snapcraft-alsa.git
-    source-subdir: snapcraft-assets
-    build-packages:
-      - libasound2-dev
-    stage-packages:
-      - libasound2
-      - libasound2-plugins
-      - yad
-    stage:
-      # restrict to only audio-related files - you need to ensure
-      # that gtk3 is staged for yad to work correctly, to prompt
-      # users to connect the alsa plug or proceed with pulseaudio.
-      #
-      # This helps prevent symbol conflicts in situations where
-      # you're using a non-default library, such as those that the
-      # gnome-3-34 extension for core18 provides.
-      - etc/asound.conf
-      - snap/command-chain/alsa-launch
-      - usr/bin/yad*
-      - usr/lib/*/alsa-lib
-      - usr/lib/*/libasound*
-      - usr/lib/*/libasyncns*
-      - usr/lib/*/libdnsfile*
-      - usr/lib/*/libFLAC*
-      - usr/lib/*/libjack*
-      - usr/lib/*/libpulse*
-      - usr/lib/*/libsamplerate*
-      - usr/lib/*/libsndfile*
-      - usr/lib/*/libspeex*
-      - usr/lib/*/libvorbis*
-      - usr/lib/*/pulseaudio
-      - usr/share/alsa
-      
-layout:
-  /usr/lib/x86_64-linux-gnu/dri:
-    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/dri
-  /usr/share/alsa:
-    bind: $SNAP/usr/share/alsa
-  /etc/alsa/conf.d:
-    bind: $SNAP/etc/alsa/conf.d
-  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib:
-    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib
-  /etc/host.conf:
-    bind-file: $SNAP/etc/host.conf
-  /var/lib/alsa/conf.d:
-    bind: $SNAP/var/lib/alsa/conf.d
-  /usr/etc/alsa/conf.d:
-    bind: $SNAP/usr/etc/alsa/conf.d
-    
-environment:
-  LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/pulseaudio${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-  
-apps:
-  thepassage:
-    command: snap/command-chain/alsa-launch $SNAP/The.Passage/The.Passage.x86_64
-    plugs:
-      - desktop
-      - desktop-legacy
-      - wayland
-      - x11
-      - opengl
-      - audio-playback
-      - screen-inhibit-control
-      - pulseaudio

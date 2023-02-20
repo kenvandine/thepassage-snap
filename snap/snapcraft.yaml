@@ -1,8 +1,5 @@
 name: thepassage
-summary: Solve puzzles through debugging and editing parts of real code
-description: |
-  Ada has landed on a mysterious planet with one mission; find the secret map to locate the hidden bunker. Fight alien monsters, tackle obstacles and puzzles, and hack the world. Debug Javascript puzzles to help Ada create news skills, and navigate obstacles on her way through The Passage.
-version: '2.0'
+adopt-info: passage-source
 base: core22
 architectures:
 - amd64
@@ -11,17 +8,13 @@ grade: stable
 
 apps:
   thepassage:
+    desktop: com.endlessnetwork.passage.desktop
     extensions: [gnome]
-    command: /The.Passage/The.Passage.x86_64
+    command: The.Passage/The.Passage.x86_64
     plugs:
       - audio-playback
-      - desktop
-      - desktop-legacy
       - joystick
       - network
-      - opengl
-      - wayland
-      - x11
 
 parts:
   thepassage:
@@ -34,9 +27,16 @@ parts:
       mv $CRAFT_PRIME/'The Passage'/'The Passage_Data' $CRAFT_PRIME/The.Passage/'The.Passage_Data'
       rm -r $CRAFT_PRIME/'The Passage'
       chmod +x $CRAFT_PRIME/The.Passage/The.Passage.x86_64
-  desktop-files:
-    plugin: nil
-    source: desktop-file
-    override-build: |
+  passage-source:
+    source: https://github.com/endless-network/ThePassage_Binary/archive/refs/tags/v2.0.tar.gz
+    plugin: dump
+    parse-info: [com.endlessnetwork.passage.appdata.xml]
+    override-pull: |
+      craftctl default
+      sed -i 's|Icon=com.endlessnetwork.passage$|Icon=${SNAP}/meta/gui/icon.png|g' $CRAFT_PART_SRC/com.endlessnetwork.passage.desktop
+      sed -i 's|Exec=com.endlessnetwork.passage.sh$|Exec=passage|g' $CRAFT_PART_SRC/com.endlessnetwork.passage.desktop
+      # Work around the latest version number missing from the releases section of appdata
+      sed -i 's|version="1.34|version="2.0|g' $CRAFT_PART_SRC/com.endlessnetwork.passage.appdata.xml
+      
       mkdir -p $CRAFT_PART_INSTALL/meta/gui
-      cp * $CRAFT_PART_INSTALL/meta/gui
+      cp com.endlessm.passage_128.png $CRAFT_PART_INSTALL/meta/gui/icon.png

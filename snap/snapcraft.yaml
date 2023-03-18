@@ -5,6 +5,8 @@ architectures:
 - amd64
 confinement: strict
 grade: stable
+issues: https://github.com/kenvandine/thepassage-snap/issues
+contact: https://github.com/kenvandine/thepassage-snap/issues
 
 apps:
   thepassage:

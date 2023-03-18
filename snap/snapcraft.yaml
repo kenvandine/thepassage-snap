@@ -6,7 +6,7 @@ architectures:
 confinement: strict
 grade: stable
 issues: https://github.com/kenvandine/thepassage-snap/issues
-contact: https://github.com/kenvandine/thepassage-snap/issues
+contact: https://endlessstudios.com/
 
 apps:
   thepassage:
